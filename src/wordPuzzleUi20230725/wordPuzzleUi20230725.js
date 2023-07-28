@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
+import CWG from "cwg";
+import NestedGrid from "../grid"
 import "./wordPuzzleUi20230725.css";
 //https://www.daleseo.com/react-radio-buttons/ 라디오 그룹 만드는 방법
 function WordPuzzleUi20230725() {
@@ -19,7 +20,7 @@ function WordPuzzleUi20230725() {
   const { startnum, endnum, choosenum, autonum, filename } = inputs; // 비구조화 할당을 통해 값 추출
 
   const onChange = (e) => {
-    const { value, name } = e.target; // 우선 e.target 에서 name 과 value 를 추출
+    const { value, name, type } = e.target; // 우선 e.target 에서 name 과 value 를 추출
     setInputs({
       ...inputs, // 기존의 input 객체를 복사한 뒤
       [name]: value, // name 키를 가진 값을 value 로 설정
@@ -37,24 +38,92 @@ function WordPuzzleUi20230725() {
           reader.readAsText(file);
         });
       let csvText = await readFile(file);
+
       let csvList = csvText.split("\r\n");
-      setFile(csvList)
-      console.log(csvList);
+      csvList.shift();
+      csvList.pop();
+      csvList.filter((value, index, arr) => {
+        return value !== "";
+      });
+      csvList = csvList.map((e) => {
+        let word = e.split(",");
+        let idx = word[0];
+        let en = word[1];
+        let kr = word[2];
+        return {
+          idx: idx,
+          en: en,
+          kr: kr,
+        };
+      });
+      setFile(csvList);
     } catch (e) {
       console.log(e);
     }
   };
+  function randomchoose(start, end, choose) {
+    var randomlist = [];
 
+    if (start > 0 && end < file.length && end - start + 1 >= choose && choose>1) {
+      while (randomlist.length < choose) {
+        var random = Math.floor(Math.random() * (end - start + 1));
+        if (randomlist.indexOf(random) == -1) {
+          randomlist.push(random);
+        }
+      }
+      return randomlist.map((e) => {
+        return file[start - 1 + e];
+      });
+    } else {
+      setData([]);
+      window.confirm("데이터 범위가 올바르지 않습니다. 다시 확인해주세요.");
+      return [];
+    }
+  }
   function uploadfile() {}
-  function createone(startnum, endnum, choosenum) {
-    const start = startnum
-    const end = endnum
-    const choose = choosenum
-    console.log(start, end, choose, file.length)
+  function createone(start, end, choose) {
+    let randomdata = randomchoose(start, end, choose);
+    let worddict = {};
+    for (let idx in randomdata) {
+      worddict[randomdata[idx]["en"]] = randomdata[idx];
+    }
+    let wordlist = Object.keys(worddict);
+    let count = 0
+    let cwg =false
+    while(count<10 && cwg==false){
+      cwg = CWG(wordlist);
+      count = count +1
+    }
+    return {
+      'word': worddict,
+      'cwg': cwg
+    }
   }
   function deleteone() {}
   function createnew() {
-    createone(startnum, endnum, choosenum)
+    
+    let start = Number(startnum);
+    let end = Number(endnum);
+    let choose = Number(choosenum);
+    let cwglist = []
+    let count =0
+    while(cwglist.length<5 && count<10){
+      let cwg = createone(start, end, choose);
+      if(cwg['cwg']==false){
+        count = count +1
+      }else{
+        cwglist.push(cwg)
+      }
+    }
+    console.log(cwglist)
+    if(cwglist.length<5){
+      window.confirm("데이터의 범위를 늘려주세요.")
+      setData([])
+    }else{
+      window.confirm("새로운 puzzle이 생성되었습니다.")
+      setData(cwglist)
+    }
+    
   }
   function createAuto() {}
   function savePDF() {}
@@ -247,11 +316,12 @@ function WordPuzzleUi20230725() {
             />
           </div>
         </button>
-        <div
-          data-layer="5a3d146a-10b4-4945-ae5a-efef7a093ae2"
-          className="x4"
-        ></div>
         <button onClick={() => createnew()}>
+          <div
+            data-layer="5a3d146a-10b4-4945-ae5a-efef7a093ae2"
+            className="x4"
+          ></div>
+
           <div
             data-layer="ff4802b6-7d28-4b86-b92f-1fdd0e6ac36c"
             className="xfb76e7a2"
@@ -319,7 +389,7 @@ function WordPuzzleUi20230725() {
             height: "820px",
           }}
         >
-          파일 업로드 후 단어 퍼즐을 생성해 주세요.
+          {data.length==0?"파일 업로드 후 단어 퍼즐을 생성해 주세요.": NestedGrid(data[0]['cwg']['ownerMap'])}
         </div>
         <div data-layer="52d0ea2d-18ba-4228-8be5-71726d70bf89" className="x19">
           {" "}
@@ -336,6 +406,7 @@ function WordPuzzleUi20230725() {
               type="number"
               placeholder="사용할 단어 갯수"
               onChange={(e) => onChange(e)}
+              min={2}
               value={choosenum}
               style={{
                 height: 91,

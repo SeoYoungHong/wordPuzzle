@@ -9,38 +9,37 @@ const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(1),
   textAlign: "center",
-  color: theme.palette.text.secondary
+  color: theme.palette.text.secondary,
 }));
 
-function FormRow() {
+function FormRow({ row }) {
+  
   return (
     <React.Fragment>
-      <Grid item xs={0.7}>
-        <Item>a</Item>
-      </Grid>
-      <Grid item xs={0.7}>
-        <Item>b</Item>
-      </Grid>
-      <Grid item xs={0.7}>
-        <Item>c</Item>
-      </Grid>
+      {[...row].map((e) => {
+        return (
+          <Grid item xs={0.7}>
+            {console.log(e)}
+            <Item>{e==undefined?'----':e['letter']}</Item>
+          </Grid>
+        );
+      })}
     </React.Fragment>
   );
 }
 
-export default function NestedGrid() {
+export default function NestedGrid(list) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1}>
-        <Grid container item spacing={1}>
-          <FormRow />
-        </Grid>
-        <Grid container item spacing={1}>
-          <FormRow />
-        </Grid>
-        <Grid container item spacing={1}>
-          <FormRow />
-        </Grid>
+        {list.map((row) => {
+          
+          return (
+            <Grid container item spacing={1}>
+              <FormRow row={row}></FormRow>
+            </Grid>
+          );
+        })}
       </Grid>
     </Box>
   );
