@@ -1,49 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
-import CWG from 'cwg'
-import WordPuzzleUi20230725 from'./wordPuzzleUi20230725/wordPuzzleUi20230725'
+import logo from "./logo.svg";
+import "./App.css";
+import CWG from "cwg";
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import WordPuzzleUi20230725 from "./wordPuzzleUi20230725/wordPuzzleUi20230725";
+import PDFviewer from "./document/pdfviewer";
+import CwpViewer from "./document/cwpviewer";
 //https://codesandbox.io/s/stupefied-rosalind-3fsy8q?file=/demo.tsx
 function App() {
-  const words = [
-    'be',
-    'bring',
-    'containue',
-    'curl',
-    'decide',
-    'fit',
-    'fix',
-    'get',
-    'go',
-    'have',
-    'join',
-    'lie',
-    'marry',
-    'muliply',
-    'nod',
-    'plan',
-    'post',
-    'pretend',
-    'rake',
-    'repair',
-    'rob',
-    'scream',
-    'shout',
-    'sink',
-    'take',
-    'teach',
-    'tickle',
-    'walk',
-    'worry',
-    'yell'
-  ]
-  
-  const result = CWG(words)
-  console.log(result)
+  const [data, setData] = useState([])
+  useEffect(()=>{
+    console.log('setData')
+  },[data])
   return (
-    
     <div className="App">
       <header className="App-header">
-        <WordPuzzleUi20230725></WordPuzzleUi20230725>
+        <BrowserRouter>
+
+          <Routes>
+
+            <Route path="/" element={<WordPuzzleUi20230725 setData = {setData}/>}></Route>
+            
+            <Route path="/pdf" element={<PDFviewer data = {data}/>}></Route>
+            <Route path="/viewer" element={<CwpViewer data = {data.length==0?null:data[0]['cwg']['ownerMap']}/>}></Route>
+          </Routes>
+        </BrowserRouter>
       </header>
     </div>
   );

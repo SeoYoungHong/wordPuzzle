@@ -18,9 +18,8 @@ function FormRow({ row }) {
     <React.Fragment>
       {[...row].map((e) => {
         return (
-          <Grid item xs={0.7}>
-            {console.log(e)}
-            <Item>{e==undefined?'----':e['letter']}</Item>
+          <Grid item xs={0}>
+            <Item>{e==undefined?<div style={{background:'black',width:20, height:20}}></div>:<div style={{ width:20, height:20}}>{e['letter']}</div>}</Item>
           </Grid>
         );
       })}
@@ -35,7 +34,7 @@ export default function NestedGrid(list) {
         {list.map((row) => {
           
           return (
-            <Grid container item spacing={1}>
+            <Grid container item spacing={1.2}>
               <FormRow row={row}></FormRow>
             </Grid>
           );

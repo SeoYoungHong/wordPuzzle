@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { Switch, Route, Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import CWG from "cwg";
-import NestedGrid from "../grid"
+import NestedGrid from "../grid";
+import html2canvas from "html2canvas";
 import "./wordPuzzleUi20230725.css";
-//https://www.daleseo.com/react-radio-buttons/ 라디오 그룹 만드는 방법
-function WordPuzzleUi20230725() {
+import { jsPDF } from "jspdf";
+import CwpViewer from "../document/cwpviewer";
+//https://donggov.tistory.com/204 표만들 때 참고
+const doc = new jsPDF({
+  orientation: "p", // p: 가로(기본), l: 세로
+  unit: "mm", // 단위 : "pt" (points), "mm", "cm", "m", "in" or "px" 등)
+  format: "a4", // 포맷 (페이지 크기).
+});
+const WordPuzzleUi20230725 = (props) => {
   const [inputs, setInputs] = useState({
     startnum: 0,
     endnum: 0,
@@ -13,10 +22,13 @@ function WordPuzzleUi20230725() {
     contact: 0,
     filename: "",
   });
-
+  const [page, setPage] = useState(0);
   const [file, setFile] = useState([]);
   const [data, setData] = useState([]);
-
+  useEffect(() => {
+    props.setData(data);
+    console.log("setData");
+  }, [data]);
   const { startnum, endnum, choosenum, autonum, filename } = inputs; // 비구조화 할당을 통해 값 추출
 
   const onChange = (e) => {
@@ -61,10 +73,23 @@ function WordPuzzleUi20230725() {
       console.log(e);
     }
   };
+  function onChangePage(e, name) {
+    if (name == "next" && page < data.length - 1) {
+      setPage(page + 1);
+    } else if (name == "previus" && page > 0) {
+      setPage(page - 1);
+    }
+    console.log(page);
+  }
   function randomchoose(start, end, choose) {
     var randomlist = [];
 
-    if (start > 0 && end < file.length && end - start + 1 >= choose && choose>1) {
+    if (
+      start > 0 &&
+      end < file.length + 1 &&
+      end - start + 1 >= choose &&
+      choose > 1
+    ) {
       while (randomlist.length < choose) {
         var random = Math.floor(Math.random() * (end - start + 1));
         if (randomlist.indexOf(random) == -1) {
@@ -81,52 +106,165 @@ function WordPuzzleUi20230725() {
     }
   }
   function uploadfile() {}
-  function createone(start, end, choose) {
+  function create(start, end, choose) {
     let randomdata = randomchoose(start, end, choose);
+    if (randomdata.length == 0) {
+      return false;
+    }
     let worddict = {};
     for (let idx in randomdata) {
       worddict[randomdata[idx]["en"]] = randomdata[idx];
     }
     let wordlist = Object.keys(worddict);
-    let count = 0
-    let cwg =false
-    while(count<10 && cwg==false){
+    let count = 0;
+    let cwg = false;
+    while (count < 10 && cwg == false) {
       cwg = CWG(wordlist);
-      count = count +1
+      count = count + 1;
     }
+
+    console.log(cwg);
     return {
-      'word': worddict,
-      'cwg': cwg
-    }
+      word: worddict,
+      cwg: cwg,
+    };
   }
-  function deleteone() {}
-  function createnew() {
-    
+  function deleteone() {
+    let datalist = data;
+
+    setPage(0);
+    if (data.length == 1) {
+      setData([]);
+    } else {
+      datalist.splice(1, 1);
+
+      setData(datalist);
+    }
+    setPage(0);
+  }
+  function createone() {
     let start = Number(startnum);
     let end = Number(endnum);
     let choose = Number(choosenum);
-    let cwglist = []
-    let count =0
-    while(cwglist.length<5 && count<10){
-      let cwg = createone(start, end, choose);
-      if(cwg['cwg']==false){
-        count = count +1
-      }else{
-        cwglist.push(cwg)
+    let cwglist = [];
+    let count = 0;
+    while (cwglist.length < 1 && count < 10) {
+      let cwg = create(start, end, choose);
+      if (cwg == false) {
+        break;
+      }
+      if (cwg["cwg"] == false) {
+        count = count + 1;
+      } else {
+        cwglist.push(cwg);
+        let datalist = data.push(cwg);
+        setData(data);
+        setPage(data.length - 1);
       }
     }
-    console.log(cwglist)
-    if(cwglist.length<5){
-      window.confirm("데이터의 범위를 늘려주세요.")
-      setData([])
-    }else{
-      window.confirm("새로운 puzzle이 생성되었습니다.")
-      setData(cwglist)
-    }
-    
   }
-  function createAuto() {}
-  function savePDF() {}
+  function createnew() {
+    let start = Number(startnum);
+    let end = Number(endnum);
+    let choose = Number(choosenum);
+    let cwglist = [];
+    let count = 0;
+    while (cwglist.length < 5 && count < 10) {
+      let cwg = create(start, end, choose);
+      if (cwg == false) {
+        break;
+      }
+      if (cwg["cwg"] == false) {
+        count = count + 1;
+      } else {
+        cwglist.push(cwg);
+      }
+    }
+    console.log(cwglist);
+    if (cwglist.length < 5) {
+      window.confirm("데이터의 범위를 늘려주세요.");
+      setData([]);
+    } else {
+      setData(cwglist);
+      window.confirm("새로운 puzzle이 생성되었습니다.");
+    }
+  }
+
+  function createAuto() {
+    let start = 1;
+    let end = Number(autonum);
+    let choose = end - start + 1;
+
+    let totallist = [];
+    while (end <= file.length) {
+      let count = 0;
+      let cwglist = [];
+      while (cwglist.length < 5 && count < 10) {
+        let cwg = create(start, end, choose);
+        if (cwg == false) {
+          break;
+        }
+        if (cwg["cwg"] == false) {
+          count = count + 1;
+        } else {
+          cwglist.push(cwg);
+        }
+      }
+      console.log(cwglist);
+      totallist = totallist.concat(cwglist);
+      for (var total in totallist) {
+        console.log(total);
+      }
+      if (end == file.length) {
+        break;
+      }
+      start = start + choose;
+      end = end + choose;
+      if (end > file.length) {
+        end = file.length;
+      }
+      choose = end - start + 1;
+    }
+
+    setData(totallist);
+    window.confirm("새로운 puzzle이 생성되었습니다.");
+  }
+
+  const viewer =
+    data.length != 0 ? CwpViewer(data[page]["cwg"]["ownerMap"]) : null;
+  const savePDF = async (e) => {
+    saveCanvas("capture");
+  };
+  function saveCanvas(id) {
+    html2canvas(document.getElementById(id)).then((canvas) => {
+      // base64 url 로 변환
+      var imgData = canvas.toDataURL("image/jpeg");
+
+      var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
+      var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
+      var imgHeight = (canvas.height * imgWidth) / canvas.width;
+      var heightLeft = imgHeight;
+      var margin = 20;
+
+      var doc = new jsPDF("p", "mm", "a4");
+      var position = 0;
+
+      // 첫 페이지 출력
+      doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // 한 페이지 이상일 경우 루프 돌면서 출력
+      while (heightLeft >= 20) {
+        position = heightLeft - imgHeight;
+        doc.addPage();
+        doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // 파일 저장
+      doc.save(filename + ".pdf");
+    });
+  }
 
   return (
     <legend>
@@ -134,7 +272,9 @@ function WordPuzzleUi20230725() {
         data-layer="201f570a-4997-4514-9c4a-506c6beebdfc"
         className="wordPuzzleUi20230725"
       >
-        {" "}
+        <div>
+          <div id="capture">{viewer}</div>
+        </div>{" "}
         <div
           data-layer="5d64da31-c206-4714-870c-e69968233996"
           className="x10"
@@ -229,7 +369,7 @@ function WordPuzzleUi20230725() {
           data-layer="10a783c0-1595-45e4-ba70-26aabd3b3e16"
           className="x999999"
         >
-          999/999
+          {page + 1}/ {data.length}
         </div>
         <div
           data-layer="658637e8-999b-4ac8-8ed0-f98de250dd4c"
@@ -332,7 +472,11 @@ function WordPuzzleUi20230725() {
         <div
           data-layer="db7ad273-f77d-449f-affe-c572496f6531"
           className="x14ebccd32f"
-        ></div>
+        >
+          <div style={{ width: 20, height: 20, background: "black" }}>
+            <Link to="/pdf">pdf보기</Link>
+          </div>
+        </div>
         <button onClick={() => createAuto()}>
           <div
             data-layer="c781d921-00dc-4d0b-8dbb-133166431910"
@@ -341,11 +485,13 @@ function WordPuzzleUi20230725() {
             자동으로 만들기
           </div>
         </button>
-        <div
-          data-layer="ffe0157a-f4b9-4557-b573-6fb5ccf49bb4"
-          className="x14"
-        ></div>
-        <button onClick={() => savePDF()}>
+        
+        <button onClick={savePDF}>{console.log(data[page])}
+          <div
+            data-layer="ffe0157a-f4b9-4557-b573-6fb5ccf49bb4"
+            className="x14"
+          ></div>
+
           <div
             data-layer="42f5619c-4d05-4236-b69b-2909c7bc995b"
             className="pdf"
@@ -389,7 +535,9 @@ function WordPuzzleUi20230725() {
             height: "820px",
           }}
         >
-          {data.length==0?"파일 업로드 후 단어 퍼즐을 생성해 주세요.": NestedGrid(data[0]['cwg']['ownerMap'])}
+          {data.length == 0
+            ? "파일 업로드 후 단어 퍼즐을 생성해 주세요."
+            : NestedGrid(data[page]["cwg"]["ownerMap"])}
         </div>
         <div data-layer="52d0ea2d-18ba-4228-8be5-71726d70bf89" className="x19">
           {" "}
@@ -430,185 +578,189 @@ function WordPuzzleUi20230725() {
           data-layer="4f50ca63-7e03-477c-aff1-0e586d31a684"
           className="x28846"
         ></div>
-        <div
-          data-layer="d38d0032-6092-40b0-8e78-6b7d25a8c10b"
-          className="x37133"
-        >
-          {" "}
+        <button name="previus" onClick={(e) => onChangePage(e, "previus")}>
           <div
-            data-layer="f47ba68f-c65d-47b4-91ed-6ce886763d8b"
-            className="x2884773989dcb"
-          ></div>
-          <svg
-            data-layer="3cbff008-d548-44b0-9301-ebca50a5e982"
-            preserveAspectRatio="none"
-            viewBox="-1.5 -1.5 27 15"
-            className="x13326e4af83b5"
-          >
-            <path d="M 0 12 L 12 0 L 24 12" />
-          </svg>
-        </div>
-        <div
-          data-layer="71fcc9c5-6903-4c6f-889f-a6d82b40e7fb"
-          className="x37134"
-        >
-          {" "}
-          <div
-            data-layer="479c8b34-9470-42e3-8569-a8448fc3ff12"
-            className="x28847"
-          ></div>
-          <svg
-            data-layer="adc86455-cc9e-4216-afcc-2f87f851c641"
-            preserveAspectRatio="none"
-            viewBox="-1.5 -1.5 27 15"
-            className="x13326"
-          >
-            <path d="M 0 12 L 12 0 L 24 12" />
-          </svg>
-        </div>
-        <div
-          data-layer="69dba013-6855-4a76-870a-b4403f67eca1"
-          className="x37135"
-        >
-          {" "}
-          <div
-            data-layer="e8e2882d-d9e3-460a-a9cc-016d2bcaa595"
-            className="x947270666"
-          ></div>
-          <div
-            data-layer="80f128c6-d56a-4097-926e-1aa20b818ec6"
-            className="x37130"
+            data-layer="d38d0032-6092-40b0-8e78-6b7d25a8c10b"
+            className="x37133"
           >
             {" "}
-            <button onClick={() => deleteone()}>
+            <div
+              data-layer="f47ba68f-c65d-47b4-91ed-6ce886763d8b"
+              className="x2884773989dcb"
+            ></div>
+            <svg
+              data-layer="3cbff008-d548-44b0-9301-ebca50a5e982"
+              preserveAspectRatio="none"
+              viewBox="-1.5 -1.5 27 15"
+              className="x13326e4af83b5"
+            >
+              <path d="M 0 12 L 12 0 L 24 12" />
+            </svg>
+          </div>
+        </button>
+        <button name="next" onClick={(e) => onChangePage(e, "next")}>
+          <div
+            data-layer="71fcc9c5-6903-4c6f-889f-a6d82b40e7fb"
+            className="x37134"
+          >
+            {" "}
+            <div
+              data-layer="479c8b34-9470-42e3-8569-a8448fc3ff12"
+              className="x28847"
+            ></div>
+            <svg
+              data-layer="adc86455-cc9e-4216-afcc-2f87f851c641"
+              preserveAspectRatio="none"
+              viewBox="-1.5 -1.5 27 15"
+              className="x13326"
+            >
+              <path d="M 0 12 L 12 0 L 24 12" />
+            </svg>
+          </div>
+        </button>
+        <button onClick={() => deleteone()}>
+          <div
+            data-layer="69dba013-6855-4a76-870a-b4403f67eca1"
+            className="x37135"
+          >
+            {" "}
+            <div
+              data-layer="e8e2882d-d9e3-460a-a9cc-016d2bcaa595"
+              className="x947270666"
+            ></div>
+            <div
+              data-layer="80f128c6-d56a-4097-926e-1aa20b818ec6"
+              className="x37130"
+            >
+              {" "}
               <div
                 data-layer="c88242a8-4505-4474-8e46-25737281d579"
                 className="x193eef05"
               >
                 삭제
               </div>
-            </button>
-            <div
-              data-layer="52f5a194-b841-4e84-9e55-3d00b94c4926"
-              className="x35"
-            >
-              {" "}
               <div
-                data-layer="69a172ff-c084-40d1-bef1-532b7cf6fe1b"
-                className="x37127"
+                data-layer="52f5a194-b841-4e84-9e55-3d00b94c4926"
+                className="x35"
               >
                 {" "}
                 <div
-                  data-layer="c87a73ca-eb05-4a50-bdd1-e28e31b39fd8"
-                  className="x36302"
-                ></div>
-                <svg
-                  data-layer="5106c866-e52c-4207-9d08-7164d4504281"
-                  preserveAspectRatio="none"
-                  viewBox="-1 -1 24 2"
-                  className="x784"
+                  data-layer="69a172ff-c084-40d1-bef1-532b7cf6fe1b"
+                  className="x37127"
                 >
-                  <path d="M 0 0 L 22 0" />
-                </svg>
-                <svg
-                  data-layer="6ebd5caa-17e7-47d9-b307-9dd355c3f994"
-                  preserveAspectRatio="none"
-                  viewBox="-3822.5 708.5 13 7"
-                  className="x15225"
-                >
-                  <path d="M -3821 714 L -3821 710 L -3811 710 L -3811 714" />
-                </svg>
-                <svg
-                  data-layer="520006ba-e99c-4bae-9565-b2e304994bea"
-                  preserveAspectRatio="none"
-                  viewBox="-1 -1 2 8"
-                  className="x785"
-                >
-                  <path d="M 0 0 L 0 6" />
-                </svg>
-                <svg
-                  data-layer="c968c635-5657-42f9-9a08-1a94004d22ef"
-                  preserveAspectRatio="none"
-                  viewBox="-1 -1 2 8"
-                  className="x786"
-                >
-                  <path d="M 0 0 L 0 6" />
-                </svg>
-                <div
-                  data-layer="3aa70501-6133-4cee-99bd-c997adee0178"
-                  className="x36303"
-                ></div>
+                  {" "}
+                  <div
+                    data-layer="c87a73ca-eb05-4a50-bdd1-e28e31b39fd8"
+                    className="x36302"
+                  ></div>
+                  <svg
+                    data-layer="5106c866-e52c-4207-9d08-7164d4504281"
+                    preserveAspectRatio="none"
+                    viewBox="-1 -1 24 2"
+                    className="x784"
+                  >
+                    <path d="M 0 0 L 22 0" />
+                  </svg>
+                  <svg
+                    data-layer="6ebd5caa-17e7-47d9-b307-9dd355c3f994"
+                    preserveAspectRatio="none"
+                    viewBox="-3822.5 708.5 13 7"
+                    className="x15225"
+                  >
+                    <path d="M -3821 714 L -3821 710 L -3811 710 L -3811 714" />
+                  </svg>
+                  <svg
+                    data-layer="520006ba-e99c-4bae-9565-b2e304994bea"
+                    preserveAspectRatio="none"
+                    viewBox="-1 -1 2 8"
+                    className="x785"
+                  >
+                    <path d="M 0 0 L 0 6" />
+                  </svg>
+                  <svg
+                    data-layer="c968c635-5657-42f9-9a08-1a94004d22ef"
+                    preserveAspectRatio="none"
+                    viewBox="-1 -1 2 8"
+                    className="x786"
+                  >
+                    <path d="M 0 0 L 0 6" />
+                  </svg>
+                  <div
+                    data-layer="3aa70501-6133-4cee-99bd-c997adee0178"
+                    className="x36303"
+                  ></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div
-          data-layer="cc1974dd-a8bb-4612-8e6e-46d4d6259c25"
-          className="x37136"
+        </button>
+        <button
+          onClick={() => {
+            createone();
+          }}
         >
-          {" "}
           <div
-            data-layer="467a9bc3-1682-468e-93d6-7b4fc83e61e3"
-            className="x9"
-          ></div>
-          <div
-            data-layer="a02d3e5f-4107-4773-bd75-dd2e2ba640b4"
-            className="x37132"
+            data-layer="cc1974dd-a8bb-4612-8e6e-46d4d6259c25"
+            className="x37136"
           >
             {" "}
-            <button
-              onClick={() => {
-                createone();
-              }}
+            <div
+              data-layer="467a9bc3-1682-468e-93d6-7b4fc83e61e3"
+              className="x9"
+            ></div>
+            <div
+              data-layer="a02d3e5f-4107-4773-bd75-dd2e2ba640b4"
+              className="x37132"
             >
+              {" "}
               <div
                 data-layer="18864a03-175d-4a73-a222-52cd80fd6091"
                 className="x0097c03b"
               >
                 추가
               </div>
-            </button>
-            <div
-              data-layer="415eb980-96dd-494d-886c-e1d78f4a34d6"
-              className="x37128"
-            >
-              {" "}
               <div
-                data-layer="9147f93e-73a4-4ffc-9bf5-344c035f8818"
-                className="x32902"
+                data-layer="415eb980-96dd-494d-886c-e1d78f4a34d6"
+                className="x37128"
               >
                 {" "}
                 <div
-                  data-layer="1798bc81-7c01-4551-96f4-ba2be02af67d"
-                  className="x33144"
+                  data-layer="9147f93e-73a4-4ffc-9bf5-344c035f8818"
+                  className="x32902"
                 >
                   {" "}
                   <div
-                    data-layer="429ae08b-8060-4afc-94d9-4cb7703d9b07"
-                    className="x31106"
-                  ></div>
+                    data-layer="1798bc81-7c01-4551-96f4-ba2be02af67d"
+                    className="x33144"
+                  >
+                    {" "}
+                    <div
+                      data-layer="429ae08b-8060-4afc-94d9-4cb7703d9b07"
+                      className="x31106"
+                    ></div>
+                    <div
+                      data-layer="0015ba19-dddb-4b66-b188-e694f9b61025"
+                      className="x31107"
+                    ></div>
+                  </div>
+                </div>
+                <div
+                  data-layer="fd262f37-d651-4a1b-a0b2-3a0bd370dd80"
+                  className="x33143"
+                >
+                  {" "}
                   <div
-                    data-layer="0015ba19-dddb-4b66-b188-e694f9b61025"
-                    className="x31107"
+                    data-layer="b3842a2a-92fe-4f8c-a393-b0f2a14d26d4"
+                    className="x193"
                   ></div>
                 </div>
               </div>
-              <div
-                data-layer="fd262f37-d651-4a1b-a0b2-3a0bd370dd80"
-                className="x33143"
-              >
-                {" "}
-                <div
-                  data-layer="b3842a2a-92fe-4f8c-a393-b0f2a14d26d4"
-                  className="x193"
-                ></div>
-              </div>
             </div>
           </div>
-        </div>
+        </button>
       </div>
     </legend>
   );
-}
+};
 
 export default WordPuzzleUi20230725;
