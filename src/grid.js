@@ -3,23 +3,59 @@ import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
+// import { color } from "html2canvas/dist/types/css/types/color";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
-  padding: theme.spacing(1),
   textAlign: "center",
   color: theme.palette.text.secondary,
+  variant: "outlined",
+  square: true,
 }));
 
 function FormRow({ row }) {
-  
   return (
     <React.Fragment>
       {[...row].map((e) => {
         return (
           <Grid item xs={0}>
-            <Item>{e==undefined?<div style={{background:'black',width:20, height:20}}></div>:<div style={{ width:20, height:20}}>{e['letter']}</div>}</Item>
+            <div
+              style={{
+                borderWidth: 1,
+                borderColor: "black",
+                backgroundColor: "#fff",
+                textAlign: "center",
+                fontsize: 1,
+              }}
+            >
+              {e == undefined ? (
+                <div
+                  style={{
+                    background: "#767676",
+                    width: 35,
+                    height: 35,
+                    borderWidth: 1,
+                    borderColor: "#767676",
+
+                    borderStyle: "solid",
+                  }}
+                ></div>
+              ) : (
+                <div
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderWidth: 1,
+                    borderColor: "black",
+                    color: 'black',
+                    borderStyle: "solid",
+                  }}
+                >
+                  {e["letter"]?e['letter']:e}
+                </div>
+              )}
+            </div>
           </Grid>
         );
       })}
@@ -29,12 +65,11 @@ function FormRow({ row }) {
 
 export default function NestedGrid(list) {
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={1}>
+    <Box sx={{ flexGrow: 0 }}>
+      <Grid container spacing={0}>
         {list.map((row) => {
-          
           return (
-            <Grid container item spacing={1.2}>
+            <Grid container item spacing={0}>
               <FormRow row={row}></FormRow>
             </Grid>
           );

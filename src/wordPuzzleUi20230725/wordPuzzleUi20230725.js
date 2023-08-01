@@ -7,6 +7,7 @@ import html2canvas from "html2canvas";
 import "./wordPuzzleUi20230725.css";
 import { jsPDF } from "jspdf";
 import CwpViewer from "../document/cwpviewer";
+import QuestionViewer from "../document/question";
 //https://donggov.tistory.com/204 표만들 때 참고
 const doc = new jsPDF({
   orientation: "p", // p: 가로(기본), l: 세로
@@ -27,7 +28,6 @@ const WordPuzzleUi20230725 = (props) => {
   const [data, setData] = useState([]);
   useEffect(() => {
     props.setData(data);
-    console.log("setData");
   }, [data]);
   const { startnum, endnum, choosenum, autonum, filename } = inputs; // 비구조화 할당을 통해 값 추출
 
@@ -123,7 +123,6 @@ const WordPuzzleUi20230725 = (props) => {
       count = count + 1;
     }
 
-    console.log(cwg);
     return {
       word: worddict,
       cwg: cwg,
@@ -180,7 +179,6 @@ const WordPuzzleUi20230725 = (props) => {
         cwglist.push(cwg);
       }
     }
-    console.log(cwglist);
     if (cwglist.length < 5) {
       window.confirm("데이터의 범위를 늘려주세요.");
       setData([]);
@@ -210,10 +208,8 @@ const WordPuzzleUi20230725 = (props) => {
           cwglist.push(cwg);
         }
       }
-      console.log(cwglist);
       totallist = totallist.concat(cwglist);
       for (var total in totallist) {
-        console.log(total);
       }
       if (end == file.length) {
         break;
@@ -229,9 +225,54 @@ const WordPuzzleUi20230725 = (props) => {
     setData(totallist);
     window.confirm("새로운 puzzle이 생성되었습니다.");
   }
-
+  const questionConvert = (data) => {
+    console.log(data);
+    let height = data["cwg"]["height"];
+    let width = data["cwg"]["width"];
+    var arr = new Array(height);
+    for (var i = 0; i < arr.length; i++) {
+      arr[i] = new Array(width);
+    }
+    console.log(arr);
+    let positions = data["cwg"]["positionObjArr"];
+    let vertical=[]
+    let horizon = []
+    for (var idx = 0; idx < positions.length; idx++) {
+      let position = positions[idx];
+      let y = position["xNum"];
+      let x = position["yNum"];
+      var num=0;
+      if(arr[x][y]==null){
+        arr[x][y] = (idx + 1).toString();
+      }else{
+        num = arr[x][y]
+      }
+      
+      if (position["isHorizon"]) {
+        horizon.push({'num':num, "wordStr":position["wordStr"]})
+        for (var w = 1; w < position["wordStr"].length; w++) {
+          if(arr[x][y + w]==null){
+            arr[x][y + w] = " ";
+          }
+          
+        }
+      } else {
+        vertical.push({'num':num, "wordStr":position["wordStr"]})
+        for (var w = 1; w < position["wordStr"].length; w++) {
+          if(arr[x + w][y]==null){
+            arr[x + w][y] = " ";
+          }
+          
+        }
+      }
+    }
+    console.log(arr);
+    return arr;
+  };
   const viewer =
     data.length != 0 ? CwpViewer(data[page]["cwg"]["ownerMap"]) : null;
+  const qustion =
+    data.length != 0 ? QuestionViewer(questionConvert(data[page])) : null;
   const savePDF = async (e) => {
     saveCanvas("capture");
   };
@@ -273,7 +314,11 @@ const WordPuzzleUi20230725 = (props) => {
         className="wordPuzzleUi20230725"
       >
         <div>
-          <div id="capture">{viewer}</div>
+          <div id="capture">
+            <div>{viewer}</div>
+            <br></br>
+            <div>{qustion}</div>
+          </div>
         </div>{" "}
         <div
           data-layer="5d64da31-c206-4714-870c-e69968233996"
@@ -485,8 +530,7 @@ const WordPuzzleUi20230725 = (props) => {
             자동으로 만들기
           </div>
         </button>
-        
-        <button onClick={savePDF}>{console.log(data[page])}
+        <button onClick={savePDF}>
           <div
             data-layer="ffe0157a-f4b9-4557-b573-6fb5ccf49bb4"
             className="x14"

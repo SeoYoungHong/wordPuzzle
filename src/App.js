@@ -10,7 +10,6 @@ import CwpViewer from "./document/cwpviewer";
 function App() {
   const [data, setData] = useState([])
   useEffect(()=>{
-    console.log('setData')
   },[data])
   return (
     <div className="App">
