@@ -8,6 +8,7 @@ import "./wordPuzzleUi20230725.css";
 import { jsPDF } from "jspdf";
 import CwpViewer from "../document/cwpviewer";
 import QuestionViewer from "../document/question";
+import Hint from "../document/hint";
 //https://donggov.tistory.com/204 표만들 때 참고
 const doc = new jsPDF({
   orientation: "p", // p: 가로(기본), l: 세로
@@ -242,10 +243,11 @@ const WordPuzzleUi20230725 = (props) => {
       let y = position["xNum"];
       let x = position["yNum"];
       var num=0;
-      if(arr[x][y]==null){
+      if(arr[x][y]==null || arr[x][y]==' '){
         arr[x][y] = (idx + 1).toString();
+        num =idx+1
       }else{
-        num = arr[x][y]
+        num = Number(arr[x][y])
       }
       
       if (position["isHorizon"]) {
@@ -267,12 +269,14 @@ const WordPuzzleUi20230725 = (props) => {
       }
     }
     console.log(arr);
+    return {'question': arr, 'hint': {'ver':vertical, 'hor':horizon}}
     return arr;
   };
   const viewer =
     data.length != 0 ? CwpViewer(data[page]["cwg"]["ownerMap"]) : null;
   const qustion =
-    data.length != 0 ? QuestionViewer(questionConvert(data[page])) : null;
+    data.length != 0 ? QuestionViewer(questionConvert(data[page])['question']) : null;
+  const hint = data.length != 0 ? Hint(questionConvert(data[page])['hint']) : null;
   const savePDF = async (e) => {
     saveCanvas("capture");
   };
@@ -318,6 +322,8 @@ const WordPuzzleUi20230725 = (props) => {
             <div>{viewer}</div>
             <br></br>
             <div>{qustion}</div>
+            <br></br>
+            <div>{hint}</div>
           </div>
         </div>{" "}
         <div
