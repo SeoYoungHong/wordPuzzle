@@ -9,6 +9,8 @@ import { jsPDF } from "jspdf";
 import CwpViewer from "../document/cwpviewer";
 import QuestionViewer from "../document/question";
 import Hint from "../document/hint";
+import Question from "../document/question";
+import Pdfviewer from "../questionviewer/questionviewer";
 //https://donggov.tistory.com/204 표만들 때 참고
 const doc = new jsPDF({
   orientation: "p", // p: 가로(기본), l: 세로
@@ -236,49 +238,55 @@ const WordPuzzleUi20230725 = (props) => {
     }
     console.log(arr);
     let positions = data["cwg"]["positionObjArr"];
-    let vertical=[]
-    let horizon = []
+    let vertical = [];
+    let horizon = [];
     for (var idx = 0; idx < positions.length; idx++) {
       let position = positions[idx];
       let y = position["xNum"];
       let x = position["yNum"];
-      var num=0;
-      if(arr[x][y]==null || arr[x][y]==' '){
+      var num = 0;
+      if (arr[x][y] == null || arr[x][y] == " ") {
         arr[x][y] = (idx + 1).toString();
-        num =idx+1
-      }else{
-        num = Number(arr[x][y])
+        num = idx + 1;
+      } else {
+        num = Number(arr[x][y]);
       }
-      
+
       if (position["isHorizon"]) {
-        horizon.push({'num':num, "wordStr":position["wordStr"]})
+        horizon.push({
+          num: num,
+          wordStr: data["word"][position["wordStr"]]["kr"],
+        });
         for (var w = 1; w < position["wordStr"].length; w++) {
-          if(arr[x][y + w]==null){
+          if (arr[x][y + w] == null) {
             arr[x][y + w] = " ";
           }
-          
         }
       } else {
-        vertical.push({'num':num, "wordStr":position["wordStr"]})
+        vertical.push({
+          num: num,
+          wordStr: data["word"][position["wordStr"]]["kr"],
+        });
         for (var w = 1; w < position["wordStr"].length; w++) {
-          if(arr[x + w][y]==null){
+          if (arr[x + w][y] == null) {
             arr[x + w][y] = " ";
           }
-          
         }
       }
     }
     console.log(arr);
-    return {'question': arr, 'hint': {'ver':vertical, 'hor':horizon}}
+    return { question: arr, hint: { ver: vertical, hor: horizon } };
     return arr;
   };
   const viewer =
     data.length != 0 ? CwpViewer(data[page]["cwg"]["ownerMap"]) : null;
   const qustion =
-    data.length != 0 ? QuestionViewer(questionConvert(data[page])['question']) : null;
-  const hint = data.length != 0 ? Hint(questionConvert(data[page])['hint']) : null;
+    data.length != 0 ? Question(questionConvert(data[page])["question"]) : null;
+  const hint =
+    data.length != 0 ? Hint(questionConvert(data[page])["hint"]) : null;
   const savePDF = async (e) => {
-    saveCanvas("capture");
+    // saveCanvas("capture");
+    saveAllcanvas("capture")
   };
   function saveCanvas(id) {
     html2canvas(document.getElementById(id)).then((canvas) => {
@@ -289,7 +297,7 @@ const WordPuzzleUi20230725 = (props) => {
       var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
       var imgHeight = (canvas.height * imgWidth) / canvas.width;
       var heightLeft = imgHeight;
-      var margin = 20;
+      var margin = 0;
 
       var doc = new jsPDF("p", "mm", "a4");
       var position = 0;
@@ -310,6 +318,37 @@ const WordPuzzleUi20230725 = (props) => {
       doc.save(filename + ".pdf");
     });
   }
+  async function saveAllcanvas(id) {
+    
+    var datas = [];
+    setPage(0)
+    var doc = new jsPDF("p", "mm", "a4");
+    var position = 0;
+    var canvas = await html2canvas(document.getElementById(id));
+      var imgData = canvas.toDataURL("image/jpeg");
+      var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
+      var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
+      var imgHeight = (canvas.height * imgWidth) / canvas.width;
+      var heightLeft = imgHeight;
+      var margin = 0;
+  
+      doc.addPage();
+      doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
+    for (var idx = 1; idx < data.length; idx++) {
+      setPage(idx)
+      var canvas = await html2canvas(document.getElementById(id));
+      var imgData = canvas.toDataURL("image/jpeg");
+      var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
+      var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
+      var imgHeight = (canvas.height * imgWidth) / canvas.width;
+      var heightLeft = imgHeight;
+      var margin = 0;
+  
+      doc.addPage();
+      doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
+    }
+    doc.save(filename + ".pdf");
+  }
 
   return (
     <legend>
@@ -318,12 +357,14 @@ const WordPuzzleUi20230725 = (props) => {
         className="wordPuzzleUi20230725"
       >
         <div>
+          
           <div id="capture">
-            <div>{viewer}</div>
+            <Pdfviewer hint={hint} cwp={qustion}></Pdfviewer>
+            {/* <div>{viewer}</div>
             <br></br>
             <div>{qustion}</div>
             <br></br>
-            <div>{hint}</div>
+            <div>{hint}</div> */}
           </div>
         </div>{" "}
         <div

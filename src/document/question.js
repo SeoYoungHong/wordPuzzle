@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef, useHistory } from "react";
 import NestedGrid from "../grid";
 
-const QuestionViewer = (data) => {
+const Question = (data) => {
   console.log(data);
   
 
-  return <body>{NestedGrid(data)}</body>;
+  return <div >{NestedGrid(data)}</div>;
 };
 
-export default QuestionViewer;
+export default Question;

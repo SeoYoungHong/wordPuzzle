@@ -48,11 +48,11 @@ function FormRow({ row }) {
                     height: 35,
                     borderWidth: 1,
                     borderColor: "black",
-                    color: 'black',
+                    color: "black",
                     borderStyle: "solid",
                   }}
                 >
-                  {e["letter"]?e['letter']:e}
+                  {e["letter"] ? e["letter"] : e}
                 </div>
               )}
             </div>
@@ -65,16 +65,16 @@ function FormRow({ row }) {
 
 export default function NestedGrid(list) {
   return (
-    <Box sx={{ flexGrow: 0 }}>
+    <div style={{display:'flex', width:'fit-content', justifyContent:'center'}}>
       <Grid container spacing={0}>
         {list.map((row) => {
           return (
-            <Grid container item spacing={0}>
+            <Grid container item spacing={0} >
               <FormRow row={row}></FormRow>
             </Grid>
           );
         })}
       </Grid>
-    </Box>
+    </div>
   );
 }
