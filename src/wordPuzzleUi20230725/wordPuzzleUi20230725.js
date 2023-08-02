@@ -23,7 +23,7 @@ const WordPuzzleUi20230725 = (props) => {
     endnum: 0,
     choosenum: 0,
     autonum: 0,
-    contact: 0,
+    contact: 'row',
     filename: "",
   });
   const [page, setPage] = useState(0);
@@ -32,7 +32,7 @@ const WordPuzzleUi20230725 = (props) => {
   useEffect(() => {
     props.setData(data);
   }, [data]);
-  const { startnum, endnum, choosenum, autonum, filename } = inputs; // 비구조화 할당을 통해 값 추출
+  const { startnum, endnum, choosenum, autonum, filename, contact } = inputs; // 비구조화 할당을 통해 값 추출
 
   const onChange = (e) => {
     const { value, name, type } = e.target; // 우선 e.target 에서 name 과 value 를 추출
@@ -270,6 +270,19 @@ const WordPuzzleUi20230725 = (props) => {
         for (var w = 1; w < position["wordStr"].length; w++) {
           if (arr[x + w][y] == null) {
             arr[x + w][y] = " ";
+          }
+        }
+      }
+    }
+    const chars = 'abcdefghijklmnopqrstuvwxyz'
+    if(contact=='row'){
+      var arr2=data['cwg']["ownerMap"].slice()
+      for(var i =0; i<arr.length;i++){
+        for(var j=0; j<arr[i].length; j++){
+          if(arr2[i][j]==undefined){
+            arr[i][j]=chars.charAt(Math.floor(Math.random() * chars.length));
+          }else{
+            arr[i][j]=arr2[i][j]
           }
         }
       }
@@ -566,9 +579,9 @@ const WordPuzzleUi20230725 = (props) => {
           data-layer="db7ad273-f77d-449f-affe-c572496f6531"
           className="x14ebccd32f"
         >
-          <div style={{ width: 20, height: 20, background: "black" }}>
+          {/* <div style={{ width: 20, height: 20, background: "black" }}>
             <Link to="/pdf">pdf보기</Link>
-          </div>
+          </div> */}
         </div>
         <button onClick={() => createAuto()}>
           <div
