@@ -286,7 +286,8 @@ const WordPuzzleUi20230725 = (props) => {
     data.length != 0 ? Hint(questionConvert(data[page])["hint"]) : null;
   const savePDF = async (e) => {
     // saveCanvas("capture");
-    saveAllcanvas("capture")
+    setPage(data.length-1)
+    saveAllcanvas("capture");
   };
   function saveCanvas(id) {
     html2canvas(document.getElementById(id)).then((canvas) => {
@@ -319,23 +320,24 @@ const WordPuzzleUi20230725 = (props) => {
     });
   }
   async function saveAllcanvas(id) {
-    
+    if(page==data.length-1){
+      setPage(0)
+    }
     var datas = [];
-    setPage(0)
     var doc = new jsPDF("p", "mm", "a4");
     var position = 0;
     var canvas = await html2canvas(document.getElementById(id));
-      var imgData = canvas.toDataURL("image/jpeg");
-      var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
-      var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
-      var imgHeight = (canvas.height * imgWidth) / canvas.width;
-      var heightLeft = imgHeight;
-      var margin = 0;
-  
-      doc.addPage();
-      doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
+    var imgData = canvas.toDataURL("image/jpeg");
+    var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
+    var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
+    var imgHeight = (canvas.height * imgWidth) / canvas.width;
+    var heightLeft = imgHeight;
+    var margin = 0;
+
+    doc.addPage();
+    doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
     for (var idx = 1; idx < data.length; idx++) {
-      setPage(idx)
+      setPage(idx);
       var canvas = await html2canvas(document.getElementById(id));
       var imgData = canvas.toDataURL("image/jpeg");
       var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
@@ -343,7 +345,7 @@ const WordPuzzleUi20230725 = (props) => {
       var imgHeight = (canvas.height * imgWidth) / canvas.width;
       var heightLeft = imgHeight;
       var margin = 0;
-  
+
       doc.addPage();
       doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
     }
@@ -357,7 +359,6 @@ const WordPuzzleUi20230725 = (props) => {
         className="wordPuzzleUi20230725"
       >
         <div>
-          
           <div id="capture">
             <Pdfviewer hint={hint} cwp={qustion}></Pdfviewer>
             {/* <div>{viewer}</div>
