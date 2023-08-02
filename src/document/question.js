@@ -1,13 +1,10 @@
 import React, { useEffect, useState, useRef, useHistory } from "react";
-import NestedGrid from "../grid";
-
-import Paper from "@mui/material/Paper";
-import Grid from "@mui/material/Grid";
+import NestedGrid2 from "../grid2";
 
 const Question = (data) => {
   console.log(data);
 
-  return <div>{NestedGrid(data)}</div>;
+  return <div style={{justifyContent:'center', textAlign:'center'}}>{NestedGrid2(data)}</div>;
 };
 
 export default Question;

@@ -40,7 +40,7 @@ import Grid from "@mui/material/Grid";
 function FormRow({ data }) {
   return (
     <React.Fragment>
-      <Grid item xs={5} style={{ color: "black" }}>
+      <Grid item style={{ color: "black", width:"45%", margin:10}}>
         <div
           style={{
             borderWidth: 1,
@@ -62,7 +62,7 @@ function FormRow({ data }) {
         </div>
       </Grid>
 
-      <Grid item xs={5} style={{ color: "black" }}>
+      <Grid  style={{ color: "black",width:"45%", margin:10 }}>
         <div
           style={{
             borderWidth: 1,
@@ -89,13 +89,13 @@ function FormRow({ data }) {
 
 export default function Hint(data) {
   return (
-    <Box sx={{ flexGrow: 0 }}>
+    <div style={{width:'100%'}}>
       <Grid container spacing={1}>
-        <Grid container item spacing={1}>
+        <Grid container item spacing={1} style={{display:'flex', 'justifyContent':'center'}}>
           <FormRow data={data}></FormRow>
         </Grid>
       </Grid>
-    </Box>
+    </div>
   );
 }
 // export default Hint;

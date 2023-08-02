@@ -33,8 +33,8 @@ function FormRow({ row }) {
                 <div
                   style={{
                     background: "#767676",
-                    width: 35,
-                    height: 35,
+                    width: 50,
+                    height: 50,
                     borderWidth: 1,
                     borderColor: "#767676",
 
@@ -44,8 +44,8 @@ function FormRow({ row }) {
               ) : (
                 <div
                   style={{
-                    width: 35,
-                    height: 35,
+                    width: 50,
+                    height: 50,
                     borderWidth: 1,
                     borderColor: "black",
                     color: "black",
@@ -63,9 +63,9 @@ function FormRow({ row }) {
   );
 }
 
-export default function NestedGrid(list) {
+export default function NestedGrid2(list) {
   return (
-    <div style={{width:(list[0].length)*38, justifyContent:'center', textAlign:'center'}}>
+    <div style={{width:(list[0].length)*53}}>
       <Grid container spacing={0}>
         {list.map((row) => {
           return (

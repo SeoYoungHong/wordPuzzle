@@ -625,6 +625,8 @@ const WordPuzzleUi20230725 = (props) => {
             display: "inline-block",
             width: "820px",
             height: "820px",
+            justifyContent: "center",
+            justifyItems: "center",
           }}
         >
           {data.length == 0
