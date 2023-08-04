@@ -69,6 +69,7 @@ const Pdfviewer = (props) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          height:1800
         }}
       >
         {props.cwp}
