@@ -371,7 +371,7 @@ const WordPuzzleUi20230725 = (props) => {
         data-layer="201f570a-4997-4514-9c4a-506c6beebdfc"
         className="wordPuzzleUi20230725"
       >
-        <div>
+        <div >
           <div id="capture">
             <Pdfviewer hint={hint} cwp={qustion} header = {filename}></Pdfviewer>
             {/* <div>{viewer}</div>
@@ -636,10 +636,11 @@ const WordPuzzleUi20230725 = (props) => {
           className="x4989db39"
           style={{
             display: "inline-block",
-            width: "820px",
+            width: "840px",
             height: "820px",
             justifyContent: "center",
             justifyItems: "center",
+            overflow: "scroll"
           }}
         >
           {data.length == 0
