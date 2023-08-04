@@ -14,7 +14,7 @@ const Item = styled(Paper)(({ theme }) => ({
   square: true,
 }));
 
-function FormRow({ row }) {
+function FormRow({ row, mainwidth }) {
   return (
     <React.Fragment>
       {[...row].map((e) => {
@@ -33,8 +33,8 @@ function FormRow({ row }) {
                 <div
                   style={{
                     background: "#767676",
-                    width: 35,
-                    height: 35,
+                    width: mainwidth/row.length-2,
+                    height: mainwidth/row.length-2,
                     borderWidth: 1,
                     borderColor: "#767676",
 
@@ -44,12 +44,13 @@ function FormRow({ row }) {
               ) : (
                 <div
                   style={{
-                    width: 35,
-                    height: 35,
+                    width: mainwidth/row.length-2,
+                    height: mainwidth/row.length-2,
                     borderWidth: 1,
                     borderColor: "black",
                     color: "black",
                     borderStyle: "solid",
+                    fontSize: 400/row.length
                   }}
                 >
                   {e["letter"] ? e["letter"] : e}
@@ -64,13 +65,14 @@ function FormRow({ row }) {
 }
 
 export default function NestedGrid(list) {
+  const mainwidth =820
   return (
-    <div style={{width:(list[0].length)*38, justifyContent:'center', textAlign:'center'}}>
+    <div style={{width:mainwidth, justifyContent:'center', textAlign:'center'}}>
       <Grid container spacing={0}>
         {list.map((row) => {
           return (
             <Grid container item spacing={0} >
-              <FormRow row={row}></FormRow>
+              <FormRow row={row} mainwidth={mainwidth}></FormRow>
             </Grid>
           );
         })}

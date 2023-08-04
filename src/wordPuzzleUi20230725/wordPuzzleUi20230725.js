@@ -63,8 +63,9 @@ const WordPuzzleUi20230725 = (props) => {
       csvList = csvList.map((e) => {
         let word = e.split(",");
         let idx = word[0];
-        let en = word[1];
-        let kr = word[2];
+        let en = word[1].toString().replace(" ",'')
+        let kr = word.slice(2).toString();
+        console.log(kr)
         return {
           idx: idx,
           en: en,
@@ -257,7 +258,7 @@ const WordPuzzleUi20230725 = (props) => {
           num: num,
           wordStr: data["word"][position["wordStr"]]["kr"],
         });
-        for (var w = 1; w < position["wordStr"].length; w++) {
+        for (var w = 1; w < position["wordStr"].length-1; w++) {
           if (arr[x][y + w] == null) {
             arr[x][y + w] = " ";
           }
@@ -267,7 +268,7 @@ const WordPuzzleUi20230725 = (props) => {
           num: num,
           wordStr: data["word"][position["wordStr"]]["kr"],
         });
-        for (var w = 1; w < position["wordStr"].length; w++) {
+        for (var w = 1; w < position["wordStr"].length-1; w++) {
           if (arr[x + w][y] == null) {
             arr[x + w][y] = " ";
           }
@@ -287,7 +288,6 @@ const WordPuzzleUi20230725 = (props) => {
         }
       }
     }
-    console.log(arr);
     return { question: arr, hint: { ver: vertical, hor: horizon } };
     return arr;
   };
@@ -373,7 +373,7 @@ const WordPuzzleUi20230725 = (props) => {
       >
         <div>
           <div id="capture">
-            <Pdfviewer hint={hint} cwp={qustion}></Pdfviewer>
+            <Pdfviewer hint={hint} cwp={qustion} header = {filename}></Pdfviewer>
             {/* <div>{viewer}</div>
             <br></br>
             <div>{qustion}</div>

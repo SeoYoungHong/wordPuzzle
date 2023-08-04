@@ -2,7 +2,6 @@ import React from "react";
 import "./questionviewer.css";
 
 const Pdfviewer = (props) => {
-  console.log(props);
   return (
     <body style={{ height: 3000 }}>
       <div style={{ height: 30 }}></div>
@@ -30,7 +29,7 @@ const Pdfviewer = (props) => {
             alignItems: "center",
           }}
         >
-          <div style={{ fontSize: 30 }}>header자리</div>
+          <div style={{ fontSize: 30 }}>{props.header}</div>
         </div>
       </div>
       <div style={{ height: 20 }}></div>
