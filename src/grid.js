@@ -33,8 +33,8 @@ function FormRow({ row, mainwidth }) {
                 <div
                   style={{
                     background: "#767676",
-                    width: mainwidth/row.length-2,
-                    height: mainwidth/row.length-2,
+                    width: mainwidth/(row.length+1)-2,
+                    height: mainwidth/(row.length+1)-2,
                     borderWidth: 1,
                     borderColor: "#767676",
 
@@ -44,8 +44,8 @@ function FormRow({ row, mainwidth }) {
               ) : (
                 <div
                   style={{
-                    width: mainwidth/row.length-2,
-                    height: mainwidth/row.length-2,
+                    width: mainwidth/(row.length+1)-2,
+                    height: mainwidth/(row.length+1)-2,
                     borderWidth: 1,
                     borderColor: "black",
                     color: "black",
