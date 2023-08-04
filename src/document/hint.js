@@ -40,17 +40,17 @@ import Grid from "@mui/material/Grid";
 function FormRow({ data }) {
   return (
     <React.Fragment>
-      <Grid item style={{ color: "black", width:"45%", margin:10}}>
+      <Grid item style={{ color: "black", width:"45%", margin:10, padding:20}}>
         <div
           style={{
             borderWidth: 1,
             color: "black",
             borderStyle: "solid",
           }}
-        >
+        ><br></br>
           <div>가로</div>
           <br></br>
-          <div style={{ columns: 2 }}>
+          <div style={{ columns: 2, padding:20 }}>
             {data["hor"].map((e) => {
               return (
                 <div style={{ color: "black" }}>
@@ -62,17 +62,17 @@ function FormRow({ data }) {
         </div>
       </Grid>
 
-      <Grid  style={{ color: "black",width:"45%", margin:10 }}>
+      <Grid  style={{ color: "black",width:"45%", margin:10 , padding:20}}>
         <div
           style={{
             borderWidth: 1,
             color: "black",
             borderStyle: "solid",
           }}
-        >
+        ><br></br>
           <div>세로</div>
           <br></br>
-          <div style={{ columns: 2 }}>
+          <div style={{ columns: 2, padding:20 }}>
             {data["ver"].map((e) => {
               return (
                 <div style={{ color: "black" }}>

@@ -8,9 +8,11 @@ function createWindow() {
     * */
     const win = new BrowserWindow({
         width:1920,
-        height:1080
+        height:1080,
+        fullscreen: false,
+        resizable:true,
+        icon: path.join(__dirname, '/../build/logo64.png')
     });
-
     /*
     * ELECTRON_START_URL을 직접 제공할경우 해당 URL을 로드합니다.
     * 만일 URL을 따로 지정하지 않을경우 (프로덕션빌드) React 앱이

@@ -32,7 +32,6 @@ function App() {
         </Routes>
       </BrowserRouter> */}
       <WordPuzzleUi20230725 setData={setData} />
-      <div>안녕하세요</div>
     </div>
   );
 }
