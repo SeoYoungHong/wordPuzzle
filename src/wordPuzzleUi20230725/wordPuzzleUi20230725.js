@@ -31,6 +31,7 @@ const WordPuzzleUi20230725 = (props) => {
   const [data, setData] = useState([]);
   useEffect(() => {
     props.setData(data);
+    console.log(data)
   }, [data]);
   const { startnum, endnum, choosenum, autonum, filename, contact } = inputs; // 비구조화 할당을 통해 값 추출
 
@@ -65,7 +66,6 @@ const WordPuzzleUi20230725 = (props) => {
         let idx = word[0];
         let en = word[1].toString().replace(" ",'')
         let kr = word.slice(2).toString();
-        console.log(kr)
         return {
           idx: idx,
           en: en,
@@ -124,6 +124,9 @@ const WordPuzzleUi20230725 = (props) => {
     let cwg = false;
     while (count < 10 && cwg == false) {
       cwg = CWG(wordlist);
+      if(cwg['height']>35 || cwg['width']>34){
+        cwg=false
+      }
       count = count + 1;
     }
 
