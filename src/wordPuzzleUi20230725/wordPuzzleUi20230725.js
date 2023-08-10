@@ -18,20 +18,22 @@ const doc = new jsPDF({
   format: "a4", // 포맷 (페이지 크기).
 });
 const WordPuzzleUi20230725 = (props) => {
+  var pritpage=0
   const [inputs, setInputs] = useState({
     startnum: 0,
     endnum: 0,
     choosenum: 0,
     autonum: 0,
-    contact: 'row',
+    contact: "row",
     filename: "",
   });
   const [page, setPage] = useState(0);
   const [file, setFile] = useState([]);
   const [data, setData] = useState([]);
+  const [save, setSave] = useState(false);
   useEffect(() => {
     props.setData(data);
-    console.log(data)
+    console.log(data);
   }, [data]);
   const { startnum, endnum, choosenum, autonum, filename, contact } = inputs; // 비구조화 할당을 통해 값 추출
 
@@ -64,8 +66,8 @@ const WordPuzzleUi20230725 = (props) => {
       csvList = csvList.map((e) => {
         let word = e.split(",");
         let idx = word[0];
-        let en = word[1].toString().replace(" ",'')
-        let kr = word.slice(2).toString();
+        let en = word[1].toString().replace(" ", "");
+        let kr = word.slice(2).toString().replace('"');
         return {
           idx: idx,
           en: en,
@@ -124,8 +126,8 @@ const WordPuzzleUi20230725 = (props) => {
     let cwg = false;
     while (count < 10 && cwg == false) {
       cwg = CWG(wordlist);
-      if(cwg['height']>35 || cwg['width']>34){
-        cwg=false
+      if (cwg["height"] > 33 || cwg["width"] > 30) {
+        cwg = false;
       }
       count = count + 1;
     }
@@ -261,7 +263,7 @@ const WordPuzzleUi20230725 = (props) => {
           num: num,
           wordStr: data["word"][position["wordStr"]]["kr"],
         });
-        for (var w = 1; w < position["wordStr"].length-1; w++) {
+        for (var w = 1; w < position["wordStr"].length - 1; w++) {
           if (arr[x][y + w] == null) {
             arr[x][y + w] = " ";
           }
@@ -271,22 +273,22 @@ const WordPuzzleUi20230725 = (props) => {
           num: num,
           wordStr: data["word"][position["wordStr"]]["kr"],
         });
-        for (var w = 1; w < position["wordStr"].length-1; w++) {
+        for (var w = 1; w < position["wordStr"].length - 1; w++) {
           if (arr[x + w][y] == null) {
             arr[x + w][y] = " ";
           }
         }
       }
     }
-    const chars = 'abcdefghijklmnopqrstuvwxyz'
-    if(contact=='row'){
-      var arr2=data['cwg']["ownerMap"].slice()
-      for(var i =0; i<arr.length;i++){
-        for(var j=0; j<arr[i].length; j++){
-          if(arr2[i][j]==undefined){
-            arr[i][j]=chars.charAt(Math.floor(Math.random() * chars.length));
-          }else{
-            arr[i][j]=arr2[i][j]
+    const chars = "abcdefghijklmnopqrstuvwxyz";
+    if (contact == "row") {
+      var arr2 = data["cwg"]["ownerMap"].slice();
+      for (var i = 0; i < arr.length; i++) {
+        for (var j = 0; j < arr[i].length; j++) {
+          if (arr2[i][j] == undefined) {
+            arr[i][j] = chars.charAt(Math.floor(Math.random() * chars.length));
+          } else {
+            arr[i][j] = arr2[i][j];
           }
         }
       }
@@ -302,7 +304,7 @@ const WordPuzzleUi20230725 = (props) => {
     data.length != 0 ? Hint(questionConvert(data[page])["hint"]) : null;
   const savePDF = async (e) => {
     // saveCanvas("capture");
-    setPage(data.length-1)
+    setPage(data.length - 1);
     saveAllcanvas("capture");
   };
   function saveCanvas(id) {
@@ -336,8 +338,9 @@ const WordPuzzleUi20230725 = (props) => {
     });
   }
   async function saveAllcanvas(id) {
-    if(page==data.length-1){
-      setPage(0)
+    setSave(true);
+    if (page == data.length - 1) {
+      setPage(0);
     }
     var datas = [];
     var doc = new jsPDF("p", "mm", "a4");
@@ -366,17 +369,30 @@ const WordPuzzleUi20230725 = (props) => {
       doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
     }
     doc.save(filename + ".pdf");
+    setSave(false);
   }
 
-  return (
+  return save ? (
+    <div>
+      저장중
+      <div id="capture">
+        <Pdfviewer hint={hint} cwp={qustion} header={filename} page={page} total ={data.length}></Pdfviewer>
+        {/* <div>{viewer}</div>
+            <br></br>
+            <div>{qustion}</div>
+            <br></br>
+            <div>{hint}</div> */}
+      </div>
+    </div>
+  ) : (
     <legend>
       <div
         data-layer="201f570a-4997-4514-9c4a-506c6beebdfc"
         className="wordPuzzleUi20230725"
       >
-        <div >
+        <div>
           <div id="capture">
-            <Pdfviewer hint={hint} cwp={qustion} header = {filename}></Pdfviewer>
+            <Pdfviewer hint={hint} cwp={qustion} header={filename} page={page} total ={data.length}></Pdfviewer>
             {/* <div>{viewer}</div>
             <br></br>
             <div>{qustion}</div>
@@ -643,7 +659,7 @@ const WordPuzzleUi20230725 = (props) => {
             height: "820px",
             justifyContent: "center",
             justifyItems: "center",
-            overflow: "scroll"
+            overflow: "scroll",
           }}
         >
           {data.length == 0

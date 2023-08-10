@@ -32,11 +32,11 @@ function FormRow({ row }) {
               {e == undefined ? (
                 <div
                   style={{
-                    background: "#767676",
-                    width: 50,
-                    height: 50,
+                    background: "#FFFBF3",
+                    width: 57,
+                    height: 57,
                     borderWidth: 1,
-                    borderColor: "#767676",
+                    borderColor: "#FFFBF3",
 
                     borderStyle: "solid",
                   }}
@@ -44,12 +44,13 @@ function FormRow({ row }) {
               ) : (
                 <div
                   style={{
-                    width: 50,
-                    height: 50,
+                    width: 57,
+                    height: 57,
                     borderWidth: 1,
                     borderColor: "black",
                     color: "black",
                     borderStyle: "solid",
+                    fontSize:40
                   }}
                 >
                   {e["letter"] ? e["letter"] : e}
@@ -65,7 +66,7 @@ function FormRow({ row }) {
 
 export default function NestedGrid2(list) {
   return (
-    <div style={{width:(list[0].length)*53}}>
+    <div style={{width:(list[0].length)*61}}>
       <Grid container spacing={0}>
         {list.map((row) => {
           return (

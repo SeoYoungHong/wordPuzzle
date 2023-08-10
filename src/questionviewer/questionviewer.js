@@ -2,6 +2,7 @@ import React from "react";
 import "./questionviewer.css";
 
 const Pdfviewer = (props) => {
+  console.log(props)
   return (
     <body style={{ height: 3000 }}>
       <div style={{ height: 30 }}></div>
@@ -56,20 +57,24 @@ const Pdfviewer = (props) => {
             alignItems: "center",
           }}
         >
-          <div style={{ width: "40%", textAlign: "start" }}>time:</div>
-          <div style={{ width: "40%", textAlign: "start" }}>score:</div>
+          <div style={{ width: "40%", textAlign: "start", fontSize: 30 }}>
+            time:
+          </div>
+          <div style={{ width: "40%", textAlign: "start", fontSize: 30 }}>
+            score:
+          </div>
         </div>
       </div>
 
       <div
         style={{
           alignContent: "center",
-          padding: 50,
+          paddingTop: 50,
           justifyContent: "center",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          height:1800
+          height: 1900,
         }}
       >
         {props.cwp}
@@ -78,7 +83,7 @@ const Pdfviewer = (props) => {
       <div
         style={{
           alignContent: "center",
-          padding: 50,
+          padding: 10,
           justifyContent: "center",
           display: "flex",
           flexDirection: "row",
@@ -88,6 +93,15 @@ const Pdfviewer = (props) => {
         {props.hint}
       </div>
       <footer>
+        <div style={{
+          fontSize:30,
+          height:2500,
+          marginTop:100
+            }}>
+        {props.page+1}/ {props.total}
+        </div>
+        </footer>
+      {/* <footer>
         <div style={{ height: 30 }}></div>
         <div
           style={{
@@ -116,7 +130,7 @@ const Pdfviewer = (props) => {
             <div style={{ fontSize: 30 }}>footer자리</div>
           </div>
         </div>
-      </footer>
+      </footer> */}
     </body>
   );
 };

@@ -40,20 +40,21 @@ import Grid from "@mui/material/Grid";
 function FormRow({ data }) {
   return (
     <React.Fragment>
-      <Grid item style={{ color: "black", width:"45%", margin:10, padding:20}}>
+      <Grid item style={{ color: "black", width:"45%", margin:10, padding:10}}>
         <div
           style={{
             borderWidth: 1,
             color: "black",
-            borderStyle: "solid",
+            borderStyle: "solid", fontSize:30 
+            
           }}
         ><br></br>
-          <div>가로</div>
+          <div>Across</div>
           <br></br>
-          <div style={{ columns: 2, padding:20 }}>
+          <div style={{ columns: 2 }}>
             {data["hor"].map((e) => {
               return (
-                <div style={{ color: "black" }}>
+                <div style={{ color: "black", fontSize:25, padding:3 }}>
                   {e["num"]}. {e["wordStr"]}
                 </div>
               );
@@ -62,20 +63,20 @@ function FormRow({ data }) {
         </div>
       </Grid>
 
-      <Grid  style={{ color: "black",width:"45%", margin:10 , padding:20}}>
+      <Grid  style={{ color: "black",width:"45%", margin:10 , padding:10}}>
         <div
           style={{
             borderWidth: 1,
             color: "black",
-            borderStyle: "solid",
+            borderStyle: "solid", fontSize:30 
           }}
         ><br></br>
-          <div>세로</div>
+          <div>Down</div>
           <br></br>
-          <div style={{ columns: 2, padding:20 }}>
+          <div style={{ columns: 2}}>
             {data["ver"].map((e) => {
               return (
-                <div style={{ color: "black" }}>
+                <div style={{ color: "black", fontSize:25, padding:3 }}>
                   {e["num"]} {e["wordStr"]}
                 </div>
               );

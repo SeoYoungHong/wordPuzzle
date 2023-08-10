@@ -50,7 +50,7 @@ function FormRow({ row, mainwidth }) {
                     borderColor: "black",
                     color: "black",
                     borderStyle: "solid",
-                    fontSize: 1
+                    fontSize: 30
                   }}
                 >
                   {e["letter"] ? e["letter"] : e}
