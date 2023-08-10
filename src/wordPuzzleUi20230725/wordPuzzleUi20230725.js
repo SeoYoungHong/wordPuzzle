@@ -18,7 +18,7 @@ const doc = new jsPDF({
   format: "a4", // 포맷 (페이지 크기).
 });
 const WordPuzzleUi20230725 = (props) => {
-  var pritpage=0
+  const [page2, setPage2] = useState(0)
   const [inputs, setInputs] = useState({
     startnum: 0,
     endnum: 0,
@@ -67,7 +67,7 @@ const WordPuzzleUi20230725 = (props) => {
         let word = e.split(",");
         let idx = word[0];
         let en = word[1].toString().replace(" ", "");
-        let kr = word.slice(2).toString().replace('"');
+        let kr = word.slice(2).toString().replaceAll('\"','');
         return {
           idx: idx,
           en: en,
@@ -297,11 +297,11 @@ const WordPuzzleUi20230725 = (props) => {
     return arr;
   };
   const viewer =
-    data.length != 0 ? CwpViewer(data[page]["cwg"]["ownerMap"]) : null;
+    data.length != 0 ? CwpViewer(data[page2]["cwg"]["ownerMap"]) : null;
   const qustion =
-    data.length != 0 ? Question(questionConvert(data[page])["question"]) : null;
+    data.length != 0 ? Question(questionConvert(data[page2])["question"]) : null;
   const hint =
-    data.length != 0 ? Hint(questionConvert(data[page])["hint"]) : null;
+    data.length != 0 ? Hint(questionConvert(data[page2])["hint"]) : null;
   const savePDF = async (e) => {
     // saveCanvas("capture");
     setPage(data.length - 1);
@@ -339,24 +339,27 @@ const WordPuzzleUi20230725 = (props) => {
   }
   async function saveAllcanvas(id) {
     setSave(true);
-    if (page == data.length - 1) {
-      setPage(0);
-    }
+    // if (page == data.length - 1) {
+    //   setPage2(0);
+    // }
     var datas = [];
     var doc = new jsPDF("p", "mm", "a4");
     var position = 0;
-    var canvas = await html2canvas(document.getElementById(id));
-    var imgData = canvas.toDataURL("image/jpeg");
-    var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
-    var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
-    var imgHeight = (canvas.height * imgWidth) / canvas.width;
-    var heightLeft = imgHeight;
-    var margin = 0;
+    // var canvas = await html2canvas(document.getElementById(id));
+    // var imgData = canvas.toDataURL("image/jpeg");
+    // var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
+    // var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
+    // var imgHeight = (canvas.height * imgWidth) / canvas.width;
+    // var heightLeft = imgHeight;
+    // var margin = 0;
 
-    doc.addPage();
-    doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
-    for (var idx = 1; idx < data.length; idx++) {
-      setPage(idx);
+    // doc.addPage();
+    // doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
+    for (var idx = 0; idx < data.length; idx++) {
+      if(idx<data.length-1){
+        setPage2(idx+1);
+      }
+      
       var canvas = await html2canvas(document.getElementById(id));
       var imgData = canvas.toDataURL("image/jpeg");
       var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
@@ -370,13 +373,14 @@ const WordPuzzleUi20230725 = (props) => {
     }
     doc.save(filename + ".pdf");
     setSave(false);
+    setPage2(0)
   }
 
   return save ? (
     <div>
       저장중
       <div id="capture">
-        <Pdfviewer hint={hint} cwp={qustion} header={filename} page={page} total ={data.length}></Pdfviewer>
+        <Pdfviewer hint={hint} cwp={qustion} header={filename} page={page2} total ={data.length}></Pdfviewer>
         {/* <div>{viewer}</div>
             <br></br>
             <div>{qustion}</div>
