@@ -30,6 +30,7 @@ const Pdfviewer = (props) => {
             alignItems: "center",
           }}
         >
+          {/* <div style={{ fontSize: 30 }}>{props.header}{props.data['start']}에서{props.data['end']}중{props.data['choose']}개</div> */}
           <div style={{ fontSize: 30 }}>{props.header}</div>
         </div>
       </div>

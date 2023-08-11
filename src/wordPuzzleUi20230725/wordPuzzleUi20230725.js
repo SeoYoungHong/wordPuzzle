@@ -135,6 +135,7 @@ const WordPuzzleUi20230725 = (props) => {
     return {
       word: worddict,
       cwg: cwg,
+      data: {"start": start, "end":end, "choose": choose }
     };
   }
   function deleteone() {
@@ -263,7 +264,7 @@ const WordPuzzleUi20230725 = (props) => {
           num: num,
           wordStr: data["word"][position["wordStr"]]["kr"],
         });
-        for (var w = 1; w < position["wordStr"].length - 1; w++) {
+        for (var w = 1; w < position["wordStr"].length ; w++) {
           if (arr[x][y + w] == null) {
             arr[x][y + w] = " ";
           }
@@ -273,7 +274,7 @@ const WordPuzzleUi20230725 = (props) => {
           num: num,
           wordStr: data["word"][position["wordStr"]]["kr"],
         });
-        for (var w = 1; w < position["wordStr"].length - 1; w++) {
+        for (var w = 1; w < position["wordStr"].length ; w++) {
           if (arr[x + w][y] == null) {
             arr[x + w][y] = " ";
           }
@@ -302,6 +303,7 @@ const WordPuzzleUi20230725 = (props) => {
     data.length != 0 ? Question(questionConvert(data[page2])["question"]) : null;
   const hint =
     data.length != 0 ? Hint(questionConvert(data[page2])["hint"]) : null;
+  const info = data.length != 0? data[page2]['data']:null
   const savePDF = async (e) => {
     // saveCanvas("capture");
     setPage(data.length - 1);
@@ -377,10 +379,10 @@ const WordPuzzleUi20230725 = (props) => {
   }
 
   return save ? (
-    <div>
+    <div style={{color:'black', fontSize:50}}>
       저장중
       <div id="capture">
-        <Pdfviewer hint={hint} cwp={qustion} header={filename} page={page2} total ={data.length}></Pdfviewer>
+        <Pdfviewer hint={hint} cwp={qustion} header={filename} page={page2} total ={data.length} data={info}></Pdfviewer>
         {/* <div>{viewer}</div>
             <br></br>
             <div>{qustion}</div>
@@ -396,7 +398,7 @@ const WordPuzzleUi20230725 = (props) => {
       >
         <div>
           <div id="capture">
-            <Pdfviewer hint={hint} cwp={qustion} header={filename} page={page} total ={data.length}></Pdfviewer>
+            <Pdfviewer hint={hint} cwp={qustion} header={filename} page={page2} total ={data.length} data={info}></Pdfviewer>
             {/* <div>{viewer}</div>
             <br></br>
             <div>{qustion}</div>

@@ -77,7 +77,7 @@ function FormRow({ data }) {
             {data["ver"].map((e) => {
               return (
                 <div style={{ color: "black", fontSize:25, padding:3 }}>
-                  {e["num"]} {e["wordStr"]}
+                  {e["num"]}. {e["wordStr"]}
                 </div>
               );
             })}
