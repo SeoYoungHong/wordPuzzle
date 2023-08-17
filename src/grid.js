@@ -66,6 +66,7 @@ function FormRow({ row, mainwidth }) {
 
 export default function NestedGrid(list) {
   const mainwidth =820
+  console.log(list)
   return (
     <div style={{width:list[0].length*38, justifyContent:'center', textAlign:'center'}}>
       <Grid container spacing={0}>

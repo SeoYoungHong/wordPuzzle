@@ -18,7 +18,8 @@ const doc = new jsPDF({
   format: "a4", // 포맷 (페이지 크기).
 });
 const WordPuzzleUi20230725 = (props) => {
-  const [page2, setPage2] = useState(0)
+  const [page2, setPage2] = useState(0);
+  const [page3, setPage3] = useState(0);
   const [inputs, setInputs] = useState({
     startnum: 0,
     endnum: 0,
@@ -67,7 +68,7 @@ const WordPuzzleUi20230725 = (props) => {
         let word = e.split(",");
         let idx = word[0];
         let en = word[1].toString().replace(" ", "");
-        let kr = word.slice(2).toString().replaceAll('\"','');
+        let kr = word.slice(2).toString().replaceAll('"', "");
         return {
           idx: idx,
           en: en,
@@ -135,7 +136,7 @@ const WordPuzzleUi20230725 = (props) => {
     return {
       word: worddict,
       cwg: cwg,
-      data: {"start": start, "end":end, "choose": choose }
+      data: { start: start, end: end, choose: choose },
     };
   }
   function deleteone() {
@@ -202,38 +203,41 @@ const WordPuzzleUi20230725 = (props) => {
     let start = 1;
     let end = Number(autonum);
     let choose = end - start + 1;
-
-    let totallist = [];
-    while (end <= file.length) {
-      let count = 0;
-      let cwglist = [];
-      while (cwglist.length < 5 && count < 10) {
-        let cwg = create(start, end, choose);
-        if (cwg == false) {
+    if (choose < 20 || choose > 31) {
+      window.confirm("자동생성은 단어의 범위르 20-30사이로 해주시길 바랍니다.");
+    } else {
+      let totallist = [];
+      while (end <= file.length) {
+        let count = 0;
+        let cwglist = [];
+        while (cwglist.length < 5 && count < 10) {
+          let cwg = create(start, end, choose);
+          if (cwg == false) {
+            break;
+          }
+          if (cwg["cwg"] == false) {
+            count = count + 1;
+          } else {
+            cwglist.push(cwg);
+          }
+        }
+        totallist = totallist.concat(cwglist);
+        for (var total in totallist) {
+        }
+        if (end == file.length) {
           break;
         }
-        if (cwg["cwg"] == false) {
-          count = count + 1;
-        } else {
-          cwglist.push(cwg);
+        start = start + choose;
+        end = end + choose;
+        if (end > file.length) {
+          end = file.length;
         }
+        choose = end - start + 1;
       }
-      totallist = totallist.concat(cwglist);
-      for (var total in totallist) {
-      }
-      if (end == file.length) {
-        break;
-      }
-      start = start + choose;
-      end = end + choose;
-      if (end > file.length) {
-        end = file.length;
-      }
-      choose = end - start + 1;
-    }
 
-    setData(totallist);
-    window.confirm("새로운 puzzle이 생성되었습니다.");
+      setData(totallist);
+      window.confirm("새로운 puzzle이 생성되었습니다.");
+    }
   }
   const questionConvert = (data) => {
     console.log(data);
@@ -264,7 +268,7 @@ const WordPuzzleUi20230725 = (props) => {
           num: num,
           wordStr: data["word"][position["wordStr"]]["kr"],
         });
-        for (var w = 1; w < position["wordStr"].length ; w++) {
+        for (var w = 1; w < position["wordStr"].length; w++) {
           if (arr[x][y + w] == null) {
             arr[x][y + w] = " ";
           }
@@ -274,7 +278,7 @@ const WordPuzzleUi20230725 = (props) => {
           num: num,
           wordStr: data["word"][position["wordStr"]]["kr"],
         });
-        for (var w = 1; w < position["wordStr"].length ; w++) {
+        for (var w = 1; w < position["wordStr"].length; w++) {
           if (arr[x + w][y] == null) {
             arr[x + w][y] = " ";
           }
@@ -288,22 +292,28 @@ const WordPuzzleUi20230725 = (props) => {
         for (var j = 0; j < arr[i].length; j++) {
           if (arr2[i][j] == undefined) {
             arr[i][j] = chars.charAt(Math.floor(Math.random() * chars.length));
+            
           } else {
             arr[i][j] = arr2[i][j];
           }
         }
       }
     }
+    console.log(arr)
     return { question: arr, hint: { ver: vertical, hor: horizon } };
     return arr;
   };
   const viewer =
-    data.length != 0 ? CwpViewer(data[page2]["cwg"]["ownerMap"]) : null;
+    data.length != 0
+      ? CwpViewer(data[page3]["cwg"]["ownerMap"], page3, data.length, filename)
+      : null;
   const qustion =
-    data.length != 0 ? Question(questionConvert(data[page2])["question"]) : null;
+    data.length != 0
+      ? Question(questionConvert(data[page2])["question"])
+      : null;
   const hint =
     data.length != 0 ? Hint(questionConvert(data[page2])["hint"]) : null;
-  const info = data.length != 0? data[page2]['data']:null
+  const info = data.length != 0 ? data[page2]["data"] : null;
   const savePDF = async (e) => {
     // saveCanvas("capture");
     setPage(data.length - 1);
@@ -347,22 +357,28 @@ const WordPuzzleUi20230725 = (props) => {
     var datas = [];
     var doc = new jsPDF("p", "mm", "a4");
     var position = 0;
-    // var canvas = await html2canvas(document.getElementById(id));
-    // var imgData = canvas.toDataURL("image/jpeg");
-    // var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
-    // var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
-    // var imgHeight = (canvas.height * imgWidth) / canvas.width;
-    // var heightLeft = imgHeight;
-    // var margin = 0;
-
-    // doc.addPage();
-    // doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
     for (var idx = 0; idx < data.length; idx++) {
-      if(idx<data.length-1){
-        setPage2(idx+1);
+      if (idx < data.length - 1) {
+        setPage2(idx + 1);
       }
-      
+
       var canvas = await html2canvas(document.getElementById(id));
+      var imgData = canvas.toDataURL("image/jpeg");
+      var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
+      var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
+      var imgHeight = (canvas.height * imgWidth) / canvas.width;
+      var heightLeft = imgHeight;
+      var margin = 0;
+
+      doc.addPage();
+      doc.addImage(imgData, "jpeg", margin, position, imgWidth, imgHeight);
+    }
+    for (var idx = 0; idx < data.length; idx++) {
+      if (idx < data.length - 1) {
+        setPage3(idx + 1);
+      }
+
+      var canvas = await html2canvas(document.getElementById("answer"));
       var imgData = canvas.toDataURL("image/jpeg");
       var imgWidth = 210; // 이미지 가로 길이(mm) A4 기준
       var pageHeight = imgWidth * 1.414; // 출력 페이지 세로 길이 계산 A4 기준
@@ -375,20 +391,29 @@ const WordPuzzleUi20230725 = (props) => {
     }
     doc.save(filename + ".pdf");
     setSave(false);
-    setPage2(0)
+    setPage2(0);
+    setPage3(0)
   }
 
   return save ? (
-    <div style={{color:'black', fontSize:50}}>
+    <div style={{ color: "black", fontSize: 50 }}>
       저장중
       <div id="capture">
-        <Pdfviewer hint={hint} cwp={qustion} header={filename} page={page2} total ={data.length} data={info}></Pdfviewer>
+        <Pdfviewer
+          hint={hint}
+          cwp={qustion}
+          header={filename}
+          page={page2}
+          total={data.length}
+          data={info}
+        ></Pdfviewer>
         {/* <div>{viewer}</div>
             <br></br>
             <div>{qustion}</div>
             <br></br>
             <div>{hint}</div> */}
       </div>
+      <div id="answer">{viewer}</div>
     </div>
   ) : (
     <legend>
@@ -398,13 +423,21 @@ const WordPuzzleUi20230725 = (props) => {
       >
         <div>
           <div id="capture">
-            <Pdfviewer hint={hint} cwp={qustion} header={filename} page={page2} total ={data.length} data={info}></Pdfviewer>
+            <Pdfviewer
+              hint={hint}
+              cwp={qustion}
+              header={filename}
+              page={page2}
+              total={data.length}
+              data={info}
+            ></Pdfviewer>
             {/* <div>{viewer}</div>
             <br></br>
             <div>{qustion}</div>
             <br></br>
             <div>{hint}</div> */}
           </div>
+          <div id="answer">{viewer}</div>
         </div>{" "}
         <div
           data-layer="5d64da31-c206-4714-870c-e69968233996"
